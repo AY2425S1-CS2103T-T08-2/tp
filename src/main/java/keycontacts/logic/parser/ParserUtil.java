@@ -5,6 +5,7 @@ import static java.util.Objects.requireNonNull;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.regex.PatternSyntaxException;
 
 import keycontacts.commons.core.index.Index;
 import keycontacts.commons.util.StringUtil;
@@ -13,6 +14,7 @@ import keycontacts.model.lesson.Day;
 import keycontacts.model.lesson.Time;
 import keycontacts.model.student.Address;
 import keycontacts.model.student.Email;
+import keycontacts.model.student.GradeLevel;
 import keycontacts.model.student.Name;
 import keycontacts.model.student.Phone;
 import keycontacts.model.tag.Tag;
@@ -152,5 +154,30 @@ public class ParserUtil {
             tagSet.add(parseTag(tagName));
         }
         return tagSet;
+    }
+
+    /**
+     * Parses a {@code String gradeLevel} into a {@code GradeLevel}.
+     * Leading and trailing whitespaces will be trimmed.
+     *
+     * @throws ParseException if the given {@code gradeLevel} is invalid.
+     */
+    public static GradeLevel parseGradeLevel(String gradeLevel) throws ParseException {
+        requireNonNull(gradeLevel);
+        String trimmedGradeLevel = gradeLevel.trim();
+        if (!GradeLevel.isValidGradeLevel(trimmedGradeLevel)) {
+            throw new ParseException(GradeLevel.MESSAGE_CONSTRAINTS);
+        }
+        String schoolLevel;
+        int grade;
+        try {
+            schoolLevel = trimmedGradeLevel.split(" ")[0];
+            grade = Integer.parseInt(trimmedGradeLevel.split(" ")[1]);
+        } catch (NumberFormatException e) {
+            throw new ParseException(GradeLevel.MESSAGE_CONSTRAINTS);
+        } catch (PatternSyntaxException e) {
+            throw new ParseException(GradeLevel.MESSAGE_CONSTRAINTS);
+        }
+        return new GradeLevel(schoolLevel, grade);
     }
 }

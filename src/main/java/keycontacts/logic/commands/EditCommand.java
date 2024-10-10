@@ -3,6 +3,7 @@ package keycontacts.logic.commands;
 import static java.util.Objects.requireNonNull;
 import static keycontacts.logic.parser.CliSyntax.PREFIX_ADDRESS;
 import static keycontacts.logic.parser.CliSyntax.PREFIX_EMAIL;
+import static keycontacts.logic.parser.CliSyntax.PREFIX_GRADELEVEL;
 import static keycontacts.logic.parser.CliSyntax.PREFIX_NAME;
 import static keycontacts.logic.parser.CliSyntax.PREFIX_PHONE;
 import static keycontacts.logic.parser.CliSyntax.PREFIX_TAG;
@@ -23,6 +24,7 @@ import keycontacts.logic.commands.exceptions.CommandException;
 import keycontacts.model.Model;
 import keycontacts.model.student.Address;
 import keycontacts.model.student.Email;
+import keycontacts.model.student.GradeLevel;
 import keycontacts.model.student.Name;
 import keycontacts.model.student.Phone;
 import keycontacts.model.student.Student;
@@ -43,7 +45,8 @@ public class EditCommand extends Command {
             + "[" + PREFIX_PHONE + "PHONE] "
             + "[" + PREFIX_EMAIL + "EMAIL] "
             + "[" + PREFIX_ADDRESS + "ADDRESS] "
-            + "[" + PREFIX_TAG + "TAG]...\n"
+            + "[" + PREFIX_TAG + "TAG]..."
+            + "[" + PREFIX_GRADELEVEL + "GRADELEVEL]\n"
             + "Example: " + COMMAND_WORD + " 1 "
             + PREFIX_PHONE + "91234567 "
             + PREFIX_EMAIL + "johndoe@example.com";
@@ -88,6 +91,22 @@ public class EditCommand extends Command {
         return new CommandResult(String.format(MESSAGE_EDIT_STUDENT_SUCCESS, Messages.format(editedStudent)));
     }
 
+    /**
+     * Creates and returns a {@code Student} with the details of {@code studentToEdit}
+     * edited with {@code editStudentDescriptor}.
+     */
+    private static Student createEditedStudent(Student studentToEdit, EditStudentDescriptor editStudentDescriptor) {
+        assert studentToEdit != null;
+
+        Name updatedName = editStudentDescriptor.getName().orElse(studentToEdit.getName());
+        Phone updatedPhone = editStudentDescriptor.getPhone().orElse(studentToEdit.getPhone());
+        Email updatedEmail = editStudentDescriptor.getEmail().orElse(studentToEdit.getEmail());
+        Address updatedAddress = editStudentDescriptor.getAddress().orElse(studentToEdit.getAddress());
+        Set<Tag> updatedTags = editStudentDescriptor.getTags().orElse(studentToEdit.getTags());
+        GradeLevel updatedGradeLevel = editStudentDescriptor.getGradeLevel().orElse(studentToEdit.getGradeLevel());
+
+        return new Student(updatedName, updatedPhone, updatedEmail, updatedAddress, updatedTags, updatedGradeLevel);
+    }
 
     @Override
     public boolean equals(Object other) {
@@ -123,6 +142,7 @@ public class EditCommand extends Command {
         private Email email;
         private Address address;
         private Set<Tag> tags;
+        private GradeLevel gradeLevel;
 
         public EditStudentDescriptor() {}
 
@@ -136,13 +156,14 @@ public class EditCommand extends Command {
             setEmail(toCopy.email);
             setAddress(toCopy.address);
             setTags(toCopy.tags);
+            setGradeLevel(toCopy.gradeLevel);
         }
 
         /**
          * Returns true if at least one field is edited.
          */
         public boolean isAnyFieldEdited() {
-            return CollectionUtil.isAnyNonNull(name, phone, email, address, tags);
+            return CollectionUtil.isAnyNonNull(name, phone, email, address, tags, gradeLevel);
         }
 
         public void setName(Name name) {
@@ -177,6 +198,14 @@ public class EditCommand extends Command {
             return Optional.ofNullable(address);
         }
 
+        public void setGradeLevel(GradeLevel gradeLevel) {
+            this.gradeLevel = gradeLevel;
+        }
+
+        public Optional<GradeLevel> getGradeLevel() {
+            return Optional.ofNullable(gradeLevel);
+        }
+
         /**
          * Sets {@code tags} to this object's {@code tags}.
          * A defensive copy of {@code tags} is used internally.
@@ -205,12 +234,13 @@ public class EditCommand extends Command {
                 return false;
             }
 
-            EditStudentDescriptor otherEditStudentDescriptor = (EditStudentDescriptor) other;
-            return Objects.equals(name, otherEditStudentDescriptor.name)
-                    && Objects.equals(phone, otherEditStudentDescriptor.phone)
-                    && Objects.equals(email, otherEditStudentDescriptor.email)
-                    && Objects.equals(address, otherEditStudentDescriptor.address)
-                    && Objects.equals(tags, otherEditStudentDescriptor.tags);
+            EditStudentDescriptor otherEditPersonDescriptor = (EditStudentDescriptor) other;
+            return Objects.equals(name, otherEditPersonDescriptor.name)
+                    && Objects.equals(phone, otherEditPersonDescriptor.phone)
+                    && Objects.equals(email, otherEditPersonDescriptor.email)
+                    && Objects.equals(address, otherEditPersonDescriptor.address)
+                    && Objects.equals(tags, otherEditPersonDescriptor.tags)
+                    && Objects.equals(gradeLevel, otherEditPersonDescriptor.gradeLevel);
         }
 
         @Override
@@ -221,6 +251,7 @@ public class EditCommand extends Command {
                     .add("email", email)
                     .add("address", address)
                     .add("tags", tags)
+                    .add("gradeLevel", gradeLevel)
                     .toString();
         }
     }
