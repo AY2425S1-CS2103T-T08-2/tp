@@ -137,7 +137,7 @@
         "scheduling-a-regular-lesson-schedule": "Scheduling a regular lesson : schedule",
         "scheduling-a-makeup-lesson-makeup": "Scheduling a makeup lesson : makeup",
         "cancelling-a-lesson-cancel": "Cancelling a lesson : cancel",
-        "uncancelling-a-cancelled-regular-lesson-uncancel": "Uncancelling a cancelled regular lesson : uncancel",
+        "uncancelling-a-cancelled-lesson-uncancel": "Uncancelling a cancelled lesson : uncancel",
         "general-commands": "General Commands",
         "viewing-help-help": "Viewing help : help",
         "listing-all-students-list": "Listing all students : list",
